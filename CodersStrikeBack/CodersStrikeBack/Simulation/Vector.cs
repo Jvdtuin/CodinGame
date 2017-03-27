@@ -129,11 +129,12 @@ namespace CodersStrikeBack.Simulation
             return v1.X * v2.X + v1.Y * v2.Y;
         }
 
-        public void Normalize(double newSize)
+        public Vector Normalize(double newSize)
         {
             double factor = newSize / Size;
-            X *= factor;
-            Y *= factor;
+            double x = X* factor;
+            double y = Y * factor;
+            return new Vector(x, y);
         }
 
         public override string ToString()

@@ -9,7 +9,7 @@ namespace CodersStrikeBack.AI
 {
     public class Race
     {
-        const int podCount = 1;
+        const int podCount = 2;
 
         private Pod[] _pods;
         private IPodBrain[] _podBrains;
@@ -48,7 +48,7 @@ namespace CodersStrikeBack.AI
                 _pods[i].UpdateValues(x, y, 0, 0, 0, 1);
             }
             _podBrains[0] = new TransformedPodBrain();   _podBrains[0].SetConditions(_pods[0], _raceInfo, new[] { 2.0});
-         //   _podBrains[1] = new SimpleSeekPodBrain(_pods[1], _raceInfo, new[] { 2.5 });
+            _podBrains[1] = new SimpleSeekPodBrain(_pods[1], _raceInfo, new[] { 2.5 });
          //   _podBrains[2] = new SimpleSeekPodBrain(_pods[2], _raceInfo, new[] { 3.0 });
          //   _podBrains[3] = new SimpleSeekPodBrain(_pods[3], _raceInfo, new[] { 4.0 });
         }
