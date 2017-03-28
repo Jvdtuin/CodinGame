@@ -23,6 +23,7 @@ namespace CodersStrikeBack.AI
             Vector firstCheckpoint = _raceInfo.Checkpoints[_pod.NextCheckPointId].Position;
             Vector secondCheckpoint = _raceInfo.Checkpoints[(_pod.NextCheckPointId + 1) % _raceInfo.CheckpointCount].Position;
 
+
             if (_pod.FirstTurn)
             {
                 _pod.SetAction(firstCheckpoint, 100, false, false);
@@ -35,6 +36,9 @@ namespace CodersStrikeBack.AI
             velocity = velocity.Rotate(-_pod.AngleRad);
             firstCheckpoint = firstCheckpoint.Rotate(-_pod.AngleRad);
             secondCheckpoint = secondCheckpoint.Rotate(-_pod.AngleRad);
+            double size = Math.Sin(secondCheckpoint.AngleRad);
+            size *= size;
+            firstCheckpoint -= secondCheckpoint.Normalize(600*size);
             double stuurhoek = 0.0;
             double thrust = 100.0;
 
