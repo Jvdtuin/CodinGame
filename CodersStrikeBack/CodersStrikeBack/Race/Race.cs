@@ -9,7 +9,6 @@ namespace CodersStrikeBack.AI
 {
     public class Race
     {
-        const int podCount = 2;
 
         private Pod[] _pods;
         private IPodBrain[] _podBrains;
@@ -19,15 +18,28 @@ namespace CodersStrikeBack.AI
         public Race(RaceInfo raceInfo)
         {
             _raceInfo = raceInfo;
+            int podCount = 2;
             _pods = new Pod[podCount];
+            for (int i=0; i< podCount; i++)
+            {
+                _pods[i] = new Pod();
+            }
             _podBrains = new IPodBrain[podCount];
+            InitializePods(podCount);
+            _podBrains[0] = new TransformedPodBrain(); _podBrains[0].SetConditions(_pods[0], _raceInfo, new[] { 2.0, -300.0, 0.5 });
+            _podBrains[1] = new SimpleSeekPodBrain(_pods[1], _raceInfo, new[] { 2.5 });
+            //   _podBrains[2] = new SimpleSeekPodBrain(_pods[2], _raceInfo, new[] { 3.0 });
+            //   _podBrains[3] = new SimpleSeekPodBrain(_pods[3], _raceInfo, new[] { 4.0 });
+        }
+
+        private void InitializePods(int podCount)
+        {
             bool[] positions = new bool[podCount];
 
             Random r = new Random();
             double startline = (_raceInfo.Checkpoints[0].Position - _raceInfo.Checkpoints[1].Position).AngleRad + 0.5 * Math.PI;
             for (int i = 0; i < podCount; i++)
             {
-                _pods[i] = new Pod();
 
                 int posnr = 0;
                 do
@@ -47,10 +59,6 @@ namespace CodersStrikeBack.AI
 
                 _pods[i].UpdateValues(x, y, 0, 0, 0, 1);
             }
-            _podBrains[0] = new TransformedPodBrain();   _podBrains[0].SetConditions(_pods[0], _raceInfo, new[] { 2.0});
-            _podBrains[1] = new SimpleSeekPodBrain(_pods[1], _raceInfo, new[] { 2.5 });
-         //   _podBrains[2] = new SimpleSeekPodBrain(_pods[2], _raceInfo, new[] { 3.0 });
-         //   _podBrains[3] = new SimpleSeekPodBrain(_pods[3], _raceInfo, new[] { 4.0 });
         }
 
         public Race(RaceInfo raceInfo, IPodBrain[] podBrains)
@@ -63,6 +71,7 @@ namespace CodersStrikeBack.AI
             {
                 _pods[i] = podBrains[i].GetPod();
             }
+            InitializePods(_pods.Length);
 
         }
 

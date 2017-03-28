@@ -2,6 +2,7 @@
 using CodersStrikeBack.Simulation;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,6 +11,15 @@ namespace CodersStrikeBack.Optimizer
 {
     class Optimizer<TBrain> where TBrain:IPodBrain
     {
+        class Creature
+        {
+            public double[] genome { get; set; }
+            public int Score { get; set; } 
+        }
+
+        private List<Creature> _population = new List<Creature>();
+
+        private static Random _random = new Random();
 
         private double[] _factors;
 
@@ -17,28 +27,49 @@ namespace CodersStrikeBack.Optimizer
 
         private Type _type;
 
+
         public Optimizer()
         {
-       
-
             for (int i = 0; i < 10; i++)
             {
                 _races[i] = new RaceInfo();
             }
 
-            
+            for (int i= 0; i < 100; i++ )
+            {
+                _population.Add(new Creature()
+                {
+                    genome = new[] { _random.NextDouble() * 5.0, _random.NextDouble() * 600.0, _random.NextDouble() * 0.2 }
+                });
+            }
+
+        }
+
+        public void CalcultatePopulationScores()
+        {
+            Stopwatch sw = new Stopwatch();
+            sw.Start(); 
+            foreach(Creature creature in _population)
+            {
+                int s = CalculateScore(creature.genome);
+                creature.Score = s;
+            }
+            sw.Stop();
+
         }
 
         
-        public int RunRace(RaceInfo raceInfo)
+        public int RunRace(RaceInfo raceInfo, double[] factors)
         {
             int i = 0;
+            IPodBrain[] brains = new IPodBrain[1];
+            brains[0] = new TransformedPodBrain();
 
-            IPodBrain[] brains = new  IPodBrain[1];
-            brains[0] = new SimplePodBrain();
+            Pod pod = new Pod();
+            brains[0].SetConditions(pod, raceInfo, factors);
 
             Race race = new Race(raceInfo, brains);
-
+ 
             do
             {
                 i++;
@@ -52,17 +83,9 @@ namespace CodersStrikeBack.Optimizer
             int score = 0;
             for (int i = 0; i < 10; i++)
             {
-                IPodBrain brain = (IPodBrain)Activator.CreateInstance(_type);
-                Pod pod = new Pod();
-
-
-                pod.UpdateValues((int)_races[i].Checkpoints[0].Position.X, (int)_races[i].Checkpoints[0].Position.Y, 0, 0, 0, 1);
-
-
-                brain.SetConditions(pod, _races[i], factors);
-
-             //   score += RunRace(brain, _races[i]);
-
+                int s = RunRace(_races[i], factors);
+                if (s == 2000) { s = 5000; }
+                score += s;
             }
             return score;
         }

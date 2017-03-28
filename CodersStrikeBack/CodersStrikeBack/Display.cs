@@ -141,29 +141,14 @@ namespace CodersStrikeBack
 
         private void button4_Click(object sender, EventArgs e)
         {
-            //for (int i = 0; i < 10000; i++)
-            //{
-            //    _raceInfo = new RaceInfo();
-            //    race = new Race(_raceInfo);
-            //    int? winner = null;
-            //    int j = 0;
-            //    do
-            //    {
-            //        j++;
-            //        winner = race.Move();
-            //    } while (!winner.HasValue && j <1000);
-            //    if (winner.HasValue)
-            //    {
-
-            //        scores[winner.Value]++;
-            //    }
-            //}
+            Optimizer.Optimizer<TransformedPodBrain>
+                optimizer = new Optimizer.Optimizer<TransformedPodBrain>();
+            optimizer.CalcultatePopulationScores();
+            
+                
+         }
 
 
-      //      Optimizer.Optimizer optimizer = new Optimizer.Optimizer(typeof(SeekPodBrain));
-
-         //   optimizer.CalculateScore(new[] { 1.0 });
-        }
 
         private int[] scores = new int[4] { 0, 0, 0, 0 };
     }

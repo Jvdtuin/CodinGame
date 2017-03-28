@@ -23,10 +23,12 @@ namespace CodersStrikeBack.Simulation
             _checkpoints[i] = new Checkpoint(i, int.Parse(inputs[0]), int.Parse(inputs[1]));
         }
     }
+
 #else
+        private static Random r = new Random();
+
         public RaceInfo()
         {
-            Random r = new Random();
             _lapCount = 3;
             _checkpointCount = r.Next(3, 6);
 
