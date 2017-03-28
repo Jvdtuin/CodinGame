@@ -12,7 +12,13 @@ namespace CodersStrikeBack.AI
         private Pod _pod;
         private RaceInfo _raceInfo;
 
+        private double[] _factors;
 
+        protected double SpeedCorrection { get { return _factors[0]; } }
+
+        protected double NextWaypontCorrectionA { get { return _factors[1]; } }
+
+        protected double NextWaypontCorrectionB { get { return _factors[2]; } }
 
         public string GetAction()
         {
@@ -38,7 +44,7 @@ namespace CodersStrikeBack.AI
             secondCheckpoint = secondCheckpoint.Rotate(-_pod.AngleRad);
             double size = Math.Sin(secondCheckpoint.AngleRad);
             size *= size;
-            firstCheckpoint -= secondCheckpoint.Normalize(600*size);
+            firstCheckpoint -= secondCheckpoint.Normalize((NextWaypontCorrectionA + NextWaypontCorrectionB * firstCheckpoint.Size )* size);
             double stuurhoek = 0.0;
             double thrust = 100.0;
 
@@ -54,7 +60,7 @@ namespace CodersStrikeBack.AI
             if (firstCheckpoint.Size > d  )
             {
 
-                Vector v1 = firstCheckpoint - velocity * 2.5;
+                Vector v1 = firstCheckpoint - velocity * SpeedCorrection ;
                  stuurhoek = (v1.AngleDeg > 18.0) ? 18.0 : (v1.AngleDeg < -18.0) ? -18.0 : v1.AngleDeg;
                  thrust = 100;
                 if (v1.AngleDeg != stuurhoek)
@@ -87,7 +93,7 @@ namespace CodersStrikeBack.AI
 
         public int GetFactorCount()
         {
-            return 0;
+            return 2;
         }
 
         public Pod GetPod()
@@ -99,6 +105,7 @@ namespace CodersStrikeBack.AI
         {
             _pod = pod;
             _raceInfo = raceInfo;
+            _factors = factors;
         }
     }
 }
