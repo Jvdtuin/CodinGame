@@ -142,9 +142,13 @@ namespace CodersStrikeBack
         private void button4_Click(object sender, EventArgs e)
         {
             Optimizer.Optimizer<TransformedPodBrain>
-                optimizer = new Optimizer.Optimizer<TransformedPodBrain>();
-            optimizer.CalcultatePopulationScores();
-            
+                optimizer = new Optimizer.Optimizer<TransformedPodBrain>(40);
+            int maxscore = 100000;
+            for (int i = 0; i < 10; i++)
+            {
+                maxscore = optimizer.CalcultatePopulationScores();
+                optimizer.NextGeneration();
+            }
                 
          }
 
