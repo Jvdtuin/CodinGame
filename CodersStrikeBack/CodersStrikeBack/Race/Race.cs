@@ -26,7 +26,9 @@ namespace CodersStrikeBack.AI
             }
             _podBrains = new IPodBrain[podCount];
             InitializePods(podCount);
-            _podBrains[0] = new TransformedPodBrain(); _podBrains[0].SetConditions(_pods[0], _raceInfo, new[] { 2.342, 30.91, 0.02181 });
+            _podBrains[0] = new GeneticBrain();
+            _podBrains[0].SetConditions(_pods[0], _raceInfo, null);
+            //_podBrains[0] = new TransformedPodBrain(); _podBrains[0].SetConditions(_pods[0], _raceInfo, new[] { 2.342, 30.91, 0.02181 });
             _podBrains[1] = new SimpleSeekPodBrain(_pods[1], _raceInfo, new[] { 2.5 });
             //   _podBrains[2] = new SimpleSeekPodBrain(_pods[2], _raceInfo, new[] { 3.0 });
             //   _podBrains[3] = new SimpleSeekPodBrain(_pods[3], _raceInfo, new[] { 4.0 });

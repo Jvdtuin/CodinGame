@@ -185,6 +185,7 @@ namespace CodersStrikeBack.Simulation
             Velocity.Truncate();
             AngleDeg = Math.Round(AngleDeg);
             _turns++;
+           
         }
 
         #endregion

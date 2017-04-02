@@ -158,12 +158,9 @@ namespace CodersStrikeBack.Optimizer
             int i = 0;
             IPodBrain[] brains = new IPodBrain[1];
             brains[0] = new TransformedPodBrain();
-
             Pod pod = new Pod();
             brains[0].SetConditions(pod, raceInfo, factors);
-
             Race race = new Race(raceInfo, brains);
- 
             do
             {
                 i++;
