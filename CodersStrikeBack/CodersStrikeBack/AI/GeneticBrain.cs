@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CodersStrikeBack.Simulation;
+using System.Diagnostics;
 
 namespace CodersStrikeBack.AI
 {
@@ -51,9 +52,12 @@ namespace CodersStrikeBack.AI
                 _pod.AngleDeg = (_raceInfo.Checkpoints[1].Position - _pod.Position).AngleDeg;
             }
 
-            for (int i = 0; i < 10; i++)
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            int j = 0;
+            while (sw.ElapsedMilliseconds < 25)
             {
-                if (i > 0)
+                if (j++ > 0)
                 {
                     NextGeneration();
                 }
@@ -112,22 +116,22 @@ namespace CodersStrikeBack.AI
         public void CaluculateScore(Creature creature)
         {
             Pod creaturepod = _pod.Clone();
-            int finnisch = (_pod.NextCheckPointId + 2)%_raceInfo.CheckpointCount;
-            for (int i =0; i< GenomeSize / 3; i++) // move the pod x steps
+           
+            for (int i = 0; i < GenomeSize / 3; i++) // move the pod x steps
             {
-                double turnGen = creature.Genome[i*3];
+                double turnGen = creature.Genome[i * 3];
                 double trustGen = creature.Genome[i * 3 + 1];
                 double shieldGen = creature.Genome[i * 3 + 2];
-                Vector v = Vector.CreateVectorAngleSizeRad(creaturepod.AngleRad + (turnGen-0.5)  * Math.PI / 5.0, 1000);
+                Vector v = Vector.CreateVectorAngleSizeRad(creaturepod.AngleRad + (turnGen - 0.5) * Math.PI / 5.0, 1000);
                 v += creaturepod.Position;
 
-                int thrust = (int)(trustGen * 120);
-                thrust = (thrust > 100) ? 100 : thrust;
+                int thrust = (int)(trustGen * 150)-20;
+                thrust = (thrust > 100) ? 100 : (thrust < 0) ? 0 : thrust;
 
                 creaturepod.SetAction(v, thrust, false, false);
                 creaturepod.Rotate();
                 creaturepod.Thrust();
-               // bounces here
+                // bounces here
                 creaturepod.Move();
 
                 if ((_raceInfo.Checkpoints[creaturepod.NextCheckPointId].Position - creaturepod.Position).Size < 600)
@@ -135,8 +139,13 @@ namespace CodersStrikeBack.AI
                     creaturepod.NextCheckPointId = (creaturepod.NextCheckPointId + 1) % _raceInfo.CheckpointCount;
                 }
             }
-
             // calculate the score of that position
+            creature.Score = GetCurrentPositionScore(creaturepod);
+        }
+
+        private double GetCurrentPositionScore(Pod creaturepod)
+        {
+            int finnisch = (_pod.NextCheckPointId + 2) % _raceInfo.CheckpointCount;
             double score = 0;
             while (creaturepod.NextCheckPointId != finnisch && score < 100)
             {
@@ -146,16 +155,27 @@ namespace CodersStrikeBack.AI
                 creaturepod.Thrust();
 
                 creaturepod.Move();
-
                 if ((_raceInfo.Checkpoints[creaturepod.NextCheckPointId].Position - creaturepod.Position).Size < 600)
                 {
                     creaturepod.NextCheckPointId = (creaturepod.NextCheckPointId + 1) % _raceInfo.CheckpointCount;
                 }
                 score++;
             }
-            
+            return score;
+        }
 
-            creature.Score = score;
+        private double GetCurrentPositionScore2(Pod creaturePod)
+        {
+            double score = 0; // lower is better;
+            
+            // afstand tot net checkpoint gecorrigeerd met pod vlieg richting
+            double d = ((creaturePod.Position + creaturePod.Velocity )- _raceInfo.Checkpoints[creaturePod.NextCheckPointId].Position).Size;
+
+            int checkpointToFinish = (_raceInfo.LapCount * _raceInfo.CheckpointCount) - creaturePod.CheckPointNr;
+
+            score = checkpointToFinish * 10000 + d;
+            return score;
+            
         }
 
         public void NextGeneration()
