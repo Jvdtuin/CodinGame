@@ -74,7 +74,7 @@ namespace CodersStrikeBack
             int vy = (int)(pod.Velocity.Y * _scaleFactor);
 
             int r = (int)(pod.Radius * _scaleFactor);
-            g.DrawEllipse(pen, x - r, y - r, 2 * r, 2 * r);
+         //   g.DrawEllipse(pen, x - r, y - r, 2 * r, 2 * r);
             g.DrawLine(pen, x, y, x + vx, y + vy);
 
         }
