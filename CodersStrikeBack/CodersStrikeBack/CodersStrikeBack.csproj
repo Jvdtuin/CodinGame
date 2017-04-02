@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AI\GeneticBrain.cs" />
     <Compile Include="AI\IPodBrain.cs" />
     <Compile Include="AI\TransformedPodBrain.cs" />
     <Compile Include="Optimizer\Optimizer.cs" />
