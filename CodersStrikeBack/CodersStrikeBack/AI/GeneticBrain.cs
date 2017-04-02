@@ -46,13 +46,18 @@ namespace CodersStrikeBack.AI
 
         public string GetAction()
         {
-            for (int i =0; i< 30; i++)
+            if (_pod.FirstTurn)
             {
-                if (i>0)
+                _pod.AngleDeg = (_raceInfo.Checkpoints[1].Position - _pod.Position).AngleDeg;
+            }
+
+            for (int i = 0; i < 10; i++)
+            {
+                if (i > 0)
                 {
                     NextGeneration();
                 }
-                foreach(Creature c in _population)
+                foreach (Creature c in _population)
                 {
                     CaluculateScore(c);
                 }
@@ -61,21 +66,25 @@ namespace CodersStrikeBack.AI
                     if (c1.Score < c2.Score) { return -1; }
                     if (c1.Score > c2.Score) { return 1; }
                     return 0;
-                });             
+                });
             }
 
-            
+
             double turnGen = _population[0].Genome[0];
             double trustGen = _population[0].Genome[1];
- //           double shieldGen = creature.Genome[i * 3 + 2];
+            //           double shieldGen = creature.Genome[i * 3 + 2];
             Vector v = Vector.CreateVectorAngleSizeRad(_pod.AngleRad + (turnGen - 0.5) * Math.PI / 5, 1000);
             v += _pod.Position;
 
             int thrust = (int)(trustGen * 120);
             thrust = (thrust > 100) ? 100 : thrust;
             _pod.SetAction(v, thrust, false, false);
+            for (int i = 0; i < 10; i++)
+            {
+                MoveCreature(_population[i]);
+            }
 
-            for (int i =0; i< 100; i++)
+            for (int i =10; i< 100; i++)
             {
                 _population[i] = new Creature();
             }
@@ -103,14 +112,13 @@ namespace CodersStrikeBack.AI
         public void CaluculateScore(Creature creature)
         {
             Pod creaturepod = _pod.Clone();
-            int finnisch = (_pod.CheckPointNr + 2)%_raceInfo.CheckpointCount;
-
-            for (int i =0; i< GenomeSize / 3; i++)
+            int finnisch = (_pod.NextCheckPointId + 2)%_raceInfo.CheckpointCount;
+            for (int i =0; i< GenomeSize / 3; i++) // move the pod x steps
             {
                 double turnGen = creature.Genome[i*3];
                 double trustGen = creature.Genome[i * 3 + 1];
                 double shieldGen = creature.Genome[i * 3 + 2];
-                Vector v = Vector.CreateVectorAngleSizeRad(creaturepod.AngleRad + (turnGen-0.5)  * Math.PI / 5, 1000);
+                Vector v = Vector.CreateVectorAngleSizeRad(creaturepod.AngleRad + (turnGen-0.5)  * Math.PI / 5.0, 1000);
                 v += creaturepod.Position;
 
                 int thrust = (int)(trustGen * 120);
@@ -120,10 +128,17 @@ namespace CodersStrikeBack.AI
                 creaturepod.Rotate();
                 creaturepod.Thrust();
                // bounces here
-                creaturepod.Move();   
+                creaturepod.Move();
+
+                if ((_raceInfo.Checkpoints[creaturepod.NextCheckPointId].Position - creaturepod.Position).Size < 600)
+                {
+                    creaturepod.NextCheckPointId = (creaturepod.NextCheckPointId + 1) % _raceInfo.CheckpointCount;
+                }
             }
-            int score = 0;
-            while (creaturepod.NextCheckPointId != finnisch && score < 100  )
+
+            // calculate the score of that position
+            double score = 0;
+            while (creaturepod.NextCheckPointId != finnisch && score < 100)
             {
                 Vector v = _raceInfo.Checkpoints[creaturepod.NextCheckPointId].Position - creaturepod.Velocity * 2.5;
                 creaturepod.SetAction(v, 100, false, false);
@@ -136,9 +151,10 @@ namespace CodersStrikeBack.AI
                 {
                     creaturepod.NextCheckPointId = (creaturepod.NextCheckPointId + 1) % _raceInfo.CheckpointCount;
                 }
-
-                score++;    
+                score++;
             }
+            
+
             creature.Score = score;
         }
 
@@ -219,7 +235,19 @@ namespace CodersStrikeBack.AI
 
         }
 
-
+        private void MoveCreature(Creature creature)
+        {
+            double[] nextGenome = new double[GenomeSize];
+            for (int i = 3; i < GenomeSize; i++)
+            {
+                nextGenome[i - 3] = creature.Genome[i];
+            }
+            for (int i = GenomeSize - 3; i < GenomeSize; i++)
+            {
+                nextGenome[i] = _random.NextDouble();
+            }
+            creature.Genome = nextGenome;
+        }
 
     }
 }
