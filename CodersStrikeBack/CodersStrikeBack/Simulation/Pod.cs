@@ -69,6 +69,10 @@ namespace CodersStrikeBack.Simulation
             get { return _nextCheckPointId; }
             set
             {
+                if (value != _nextCheckPointId)
+                {
+                    _checkpointNr++;
+                }
                 _nextCheckPointId = value;
                 if (value == 1)
                 {
