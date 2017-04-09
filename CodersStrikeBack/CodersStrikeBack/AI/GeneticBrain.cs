@@ -134,7 +134,7 @@ namespace CodersStrikeBack.AI
                 // bounces here
                 creaturepod.Move();
 
-                if ((_raceInfo.Checkpoints[creaturepod.NextCheckPointId].Position - creaturepod.Position).Size < 600)
+                if ((_raceInfo.Checkpoints[creaturepod.NextCheckPointId].Position - creaturepod.Position).Size < 500)
                 {
                     creaturepod.NextCheckPointId = (creaturepod.NextCheckPointId + 1) % _raceInfo.CheckpointCount;
                 }
