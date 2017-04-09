@@ -24,7 +24,7 @@ namespace CodersStrikeBack.Simulation
             return (Position - other.Position).Size2;
         }
 
-        public static Collision CollisionData(GameUnit A, GameUnit B)
+        public static Collision GetCollisionData(GameUnit A, GameUnit B)
         {
             Vector DeltaP = A.Position - B.Position;
             Vector DeltaV = A.Velocity - B.Velocity;
@@ -58,6 +58,19 @@ namespace CodersStrikeBack.Simulation
             }
             return new Collision(A, B, t);
         } 
+
+        public static double GetClossestTime (GameUnit a, GameUnit b, out double distance)
+        {
+            Vector DeltaP = a.Position - b.Position;
+            Vector DeltaV = a.Velocity - b.Velocity;
+
+            double t = -(DeltaP * DeltaV) / DeltaV.Size2;
+
+            Vector d = DeltaP + DeltaV * t;
+            distance = d.Size;
+
+            return t;
+        }
 
 
         public override string ToString()

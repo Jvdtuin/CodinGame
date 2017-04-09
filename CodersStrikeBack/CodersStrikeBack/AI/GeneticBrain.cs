@@ -10,7 +10,9 @@ namespace CodersStrikeBack.AI
 {
     public class GeneticBrain : IPodBrain
     {
-        private const int GenomeSize = 18;
+        private const int GenomeSize = 30;
+        private const int populationSize = 50;
+        private const int ParantPopSize = 10;
 
         private static Random _random = new Random();
 
@@ -18,6 +20,8 @@ namespace CodersStrikeBack.AI
         private RaceInfo _raceInfo;
         private double[] _factors;
         private List<Creature> _population = new List<Creature>();
+
+
 
         public class Creature
         {
@@ -38,7 +42,7 @@ namespace CodersStrikeBack.AI
 
         public GeneticBrain()
         {
-            for (int i = 0; i < 100; i++)
+            for (int i = 0; i < populationSize; i++)
             {
                 _population.Add(new Creature());
             }
@@ -55,7 +59,7 @@ namespace CodersStrikeBack.AI
             Stopwatch sw = new Stopwatch();
             sw.Start();
             int j = 0;
-            while (sw.ElapsedMilliseconds < 25)
+            while (sw.ElapsedMilliseconds < 100)
             {
                 if (j++ > 0)
                 {
@@ -88,7 +92,7 @@ namespace CodersStrikeBack.AI
                 MoveCreature(_population[i]);
             }
 
-            for (int i =10; i< 100; i++)
+            for (int i =10; i< populationSize; i++)
             {
                 _population[i] = new Creature();
             }
@@ -145,19 +149,22 @@ namespace CodersStrikeBack.AI
 
         private double GetCurrentPositionScore(Pod creaturepod)
         {
+            TransformedPodBrain pb = new TransformedPodBrain();
+            pb.SetConditions(creaturepod, _raceInfo, new[] { 2.342, 30.91, 0.02181 });
+
             int finnisch = (_pod.NextCheckPointId + 2) % _raceInfo.CheckpointCount;
             double score = 0;
             while (creaturepod.NextCheckPointId != finnisch && score < 100)
             {
-                Vector v = _raceInfo.Checkpoints[creaturepod.NextCheckPointId].Position - creaturepod.Velocity * 2.5;
-                creaturepod.SetAction(v, 100, false, false);
+                pb.GetAction();
+                //creaturepod.SetAction(v, 100, false, false);
                 creaturepod.Rotate();
                 creaturepod.Thrust();
 
                 creaturepod.Move();
                 if ((_raceInfo.Checkpoints[creaturepod.NextCheckPointId].Position - creaturepod.Position).Size < 600)
                 {
-                    creaturepod.NextCheckPointId = (creaturepod.NextCheckPointId + 1) % _raceInfo.CheckpointCount;
+                    creaturepod.NextCheckPointId = (creaturepod.NextCheckPointId + 1) % _raceInfo.CheckpointCount;                
                 }
                 score++;
             }
@@ -166,16 +173,22 @@ namespace CodersStrikeBack.AI
 
         private double GetCurrentPositionScore2(Pod creaturePod)
         {
-            double score = 0; // lower is better;
-            
+            double score = _raceInfo.Distances[creaturePod.CheckPointNr] *2;
             // afstand tot net checkpoint gecorrigeerd met pod vlieg richting
-            double d = ((creaturePod.Position + creaturePod.Velocity )- _raceInfo.Checkpoints[creaturePod.NextCheckPointId].Position).Size;
+            double d = (creaturePod.Position - _raceInfo.Checkpoints[creaturePod.NextCheckPointId].Position).Size;
 
-            int checkpointToFinish = (_raceInfo.LapCount * _raceInfo.CheckpointCount) - creaturePod.CheckPointNr;
-
-            score = checkpointToFinish * 10000 + d;
-            return score;
+            double dtn;
             
+            double t = GameUnit.GetClossestTime(creaturePod, _raceInfo.Checkpoints[creaturePod.NextCheckPointId] , out dtn);
+            if (t < 0)
+            {
+                // we gaan de verkeerde kant op
+              //  score += 
+            }
+
+
+
+            return score + d;             
         }
 
         public void NextGeneration()
@@ -186,7 +199,7 @@ namespace CodersStrikeBack.AI
 
         private List<Creature> SelectParents()
         {
-            List<Creature> result = _population.Where(c => c.Score <= _population[10].Score).ToList();
+            List<Creature> result = _population.Where(c => c.Score <= _population[ParantPopSize].Score).ToList();
             if (result.Count > 10)
             {
                 for (int i = 1; i < result.Count; i++)
@@ -202,7 +215,7 @@ namespace CodersStrikeBack.AI
         {
             List<Creature> result = new List<Creature>();
             result.AddRange(paranents);
-            while (result.Count < 100)
+            while (result.Count < populationSize)
             {
                 int parent1Index = _random.Next(paranents.Count);
                 int parent2Index = _random.Next(paranents.Count - 1);

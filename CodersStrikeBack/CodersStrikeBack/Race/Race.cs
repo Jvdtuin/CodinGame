@@ -29,7 +29,7 @@ namespace CodersStrikeBack.AI
             _podBrains[0] = new GeneticBrain();
             _podBrains[0].SetConditions(_pods[0], _raceInfo, null);
             _podBrains[1] = new TransformedPodBrain(); _podBrains[1].SetConditions(_pods[1], _raceInfo, new[] { 2.342, 30.91, 0.02181 });
-          //  _podBrains[] = new SimpleSeekPodBrain(_pods[1], _raceInfo, new[] { 2.5 });
+         //   _podBrains[1] = new SimpleSeekPodBrain(_pods[1], _raceInfo, new[] { 2.5 });
             //   _podBrains[2] = new SimpleSeekPodBrain(_pods[2], _raceInfo, new[] { 3.0 });
             //   _podBrains[3] = new SimpleSeekPodBrain(_pods[3], _raceInfo, new[] { 4.0 });
         }
@@ -99,7 +99,7 @@ namespace CodersStrikeBack.AI
             {
                 for (int j = i + 1; j < _pods.Length; j++)
                 {
-                    Collision collision = GameUnit.CollisionData(_pods[i], _pods[j]);
+                    Collision collision = GameUnit.GetCollisionData(_pods[i], _pods[j]);
                     if (collision != null)
                     {
                         collisions.Add(collision);
