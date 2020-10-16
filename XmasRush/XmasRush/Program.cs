@@ -134,6 +134,18 @@ namespace XmasRush
                     default: return c;
                 }
             }
+
+            public static Cord operator -(Cord c, Direction d)
+            {
+                switch (d)
+                {
+                    case Direction.UP: return new Cord(c.X, c.Y + 1);
+                    case Direction.RIGHT: return new Cord(c.X - 1, c.Y);
+                    case Direction.DOWN: return new Cord(c.X, c.Y - 1);
+                    case Direction.LEFT: return new Cord(c.X + 1, c.Y);
+                    default: return c;
+                }
+            }
         }
 
         public void CalcMoveMap(int orgx, int orgy)
